@@ -4,8 +4,14 @@ import json
 import os
 import random
 import secrets
+import sys
 from collections import defaultdict
 from contextlib import asynccontextmanager
+from pathlib import Path
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 from fastapi import Depends, FastAPI, Form, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
