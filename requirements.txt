@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+sqlalchemy
+pydantic
+email-validator
+pytest
+httpx
+jinja2
+python-multipart
+tzdata

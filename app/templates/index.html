@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Governance Intake</title>
+  <style>
+    :root {
+      --bg-1: #f3efe6;
+      --bg-2: #dce7e1;
+      --ink: #102018;
+      --card: #ffffff;
+      --accent: #0b6e4f;
+      --accent-2: #2a9d8f;
+      --border: #bfd2c7;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 15% 20%, var(--bg-2), transparent 50%),
+                  radial-gradient(circle at 85% 80%, #f8d6b3, transparent 45%),
+                  var(--bg-1);
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+    }
+    .panel {
+      width: min(900px, 100%);
+      background: color-mix(in srgb, var(--card) 90%, transparent);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: 0 18px 40px rgba(16, 32, 24, 0.1);
+      padding: 22px;
+    }
+    h1 {
+      margin-top: 0;
+      font-size: clamp(1.3rem, 1.4vw + 1rem, 2rem);
+    }
+    p {
+      margin-top: 0;
+      opacity: 0.85;
+    }
+    .layout {
+      display: grid;
+      gap: 22px;
+    }
+    form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    .full {
+      grid-column: 1 / -1;
+    }
+    label {
+      font-size: 0.9rem;
+      display: block;
+      margin-bottom: 4px;
+    }
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      font: inherit;
+      box-sizing: border-box;
+      background: #fff;
+    }
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+    .checklist {
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.92rem;
+    }
+    .check input {
+      width: auto;
+    }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 18px;
+      color: #fff;
+      font-weight: 600;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      cursor: pointer;
+    }
+    .actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 6px;
+    }
+    .registry-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .registry-count {
+      font-size: 0.92rem;
+      color: color-mix(in srgb, var(--ink) 70%, white);
+    }
+    .registry-list {
+      display: grid;
+      gap: 12px;
+    }
+    .registry-empty {
+      padding: 18px;
+      border: 1px dashed var(--border);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--card) 75%, transparent);
+    }
+    .use-case-card {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--card) 96%, transparent);
+      padding: 16px;
+      display: grid;
+      gap: 10px;
+    }
+    .use-case-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .use-case-title {
+      margin: 0;
+      font-size: 1rem;
+    }
+    .use-case-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: #e7f3ee;
+      color: var(--accent);
+    }
+    .badge-risk-High,
+    .badge-risk-Regulated {
+      background: #fbe3d7;
+      color: #a24710;
+    }
+    .badge-risk-Medium {
+      background: #f5edc9;
+      color: #816100;
+    }
+    .badge-status-Active {
+      background: #dff3e6;
+      color: #196c3c;
+    }
+    .badge-status-Approved {
+      background: #e6eef9;
+      color: #265b9d;
+    }
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 14px;
+      font-size: 0.9rem;
+    }
+    .detail dt {
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .detail dd {
+      margin: 0;
+      opacity: 0.84;
+    }
+    @media (max-width: 760px) {
+      form, .checklist, .details-grid {
+        grid-template-columns: 1fr;
+      }
+      .use-case-top, .registry-header {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <div class="layout">
+      <section>
+        <h1>AI Use Case Registry</h1>
+        <p>Submit every enterprise AI use case. High and regulated submissions require approval before activation.</p>
+
+        <form action="/submit" method="post">
+          <div>
+            <label for="title">Use Case Title</label>
+            <input id="title" name="title" required minlength="5" />
+          </div>
+
+          <div>
+            <label for="system_name">AI System Name</label>
+            <input id="system_name" name="system_name" required />
+          </div>
+
+          <div>
+            <label for="business_unit">Business Unit</label>
+            <input id="business_unit" name="business_unit" required />
+          </div>
+
+          <div>
+            <label for="owner_name">Owner Name</label>
+            <input id="owner_name" name="owner_name" required />
+          </div>
+
+          <div class="full">
+            <label for="owner_email">Owner Email</label>
+            <input id="owner_email" name="owner_email" type="email" required />
+          </div>
+
+          <div class="full">
+            <label for="purpose">Business Purpose</label>
+            <textarea id="purpose" name="purpose" required minlength="10"></textarea>
+          </div>
+
+          <div class="full">
+            <label for="data_categories">Data Categories (comma separated, e.g. pii, financial)</label>
+            <input id="data_categories" name="data_categories" placeholder="none" />
+          </div>
+
+          <div class="full checklist">
+            <label class="check"><input type="checkbox" name="uses_external_model" value="true" /> Uses external model/provider</label>
+            <label class="check"><input type="checkbox" name="has_human_impact" value="true" /> Human-impacting output</label>
+            <label class="check"><input type="checkbox" name="automated_decision" value="true" /> Automated decision-making</label>
+            <label class="check"><input type="checkbox" name="federal_client" value="true" /> Federal client context</label>
+          </div>
+
+          <div class="actions">
+            <button type="submit">Submit Use Case</button>
+          </div>
+        </form>
+      </section>
+
+      <section>
+        <div class="registry-header">
+          <div>
+            <h2>Registered Use Cases</h2>
+            <p>Review all submitted AI usage in one panel.</p>
+          </div>
+          <div class="registry-count">{{ use_cases|length }} registered</div>
+        </div>
+
+        {% if use_cases %}
+        <div class="registry-list">
+          {% for use_case in use_cases %}
+          <article class="use-case-card">
+            <div class="use-case-top">
+              <div>
+                <h3 class="use-case-title">{{ use_case.title }}</h3>
+                <div class="use-case-meta">
+                  <span>{{ use_case.system_name }}</span>
+                  <span>&middot;</span>
+                  <span>{{ use_case.business_unit }}</span>
+                  <span>&middot;</span>
+                  <span>{{ use_case.owner_email }}</span>
+                </div>
+              </div>
+              <div class="use-case-meta">
+                <span class="badge badge-risk-{{ use_case.risk_level.value }}">{{ use_case.risk_level.value }} risk</span>
+                <span class="badge badge-status-{{ use_case.status.value }}">{{ use_case.status.value }}</span>
+              </div>
+            </div>
+
+            <div>{{ use_case.purpose }}</div>
+
+            <dl class="details-grid">
+              <div class="detail">
+                <dt>Owner</dt>
+                <dd>{{ use_case.owner_name }}</dd>
+              </div>
+              <div class="detail">
+                <dt>Risk Score</dt>
+                <dd>{{ use_case.risk_score }}</dd>
+              </div>
+              <div class="detail">
+                <dt>Data Categories</dt>
+                <dd>{{ use_case.data_categories }}</dd>
+              </div>
+              <div class="detail">
+                <dt>Submitted</dt>
+                <dd>{{ use_case.created_at.strftime("%Y-%m-%d %H:%M") }}</dd>
+              </div>
+            </dl>
+          </article>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="registry-empty">No use cases have been registered yet.</div>
+        {% endif %}
+      </section>
+    </div>
+  </main>
+</body>
+</html>

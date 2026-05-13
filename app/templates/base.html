@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ title or "AI Governance" }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-1: #f6f4ee;
+      --bg-2: #d9ebe2;
+      --bg-3: #ffe4c7;
+      --ink: #112117;
+      --muted: #4a6355;
+      --card: rgba(255, 255, 255, 0.82);
+      --accent: #115a43;
+      --accent-2: #249c83;
+      --accent-soft: #e8f6f1;
+      --border: #b8d5c8;
+      --danger: #8f2d1f;
+      --warn: #8a6a00;
+      --shadow: 0 20px 50px rgba(17, 33, 23, 0.11);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at 10% 12%, var(--bg-2), transparent 52%),
+                  radial-gradient(circle at 88% 75%, var(--bg-3), transparent 42%),
+                  linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0)),
+                  var(--bg-1);
+      min-height: 100vh;
+      position: relative;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(17, 33, 23, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(17, 33, 23, 0.035) 1px, transparent 1px);
+      background-size: 28px 28px;
+      opacity: 0.28;
+      z-index: -1;
+    }
+    .shell {
+      width: min(1180px, calc(100% - 32px));
+      margin: 24px auto;
+      display: grid;
+      gap: 18px;
+    }
+    .dashboard-title-bar {
+      position: sticky;
+      top: 10px;
+      z-index: 40;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #fff;
+      border-radius: var(--radius-lg);
+      padding: 14px 20px;
+      font-size: clamp(1.05rem, 0.9rem + 0.7vw, 1.5rem);
+      font-weight: 700;
+      font-family: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+      letter-spacing: 0.02em;
+      box-shadow: var(--shadow);
+    }
+    .menu {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 14px 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+    .menu-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .menu a,
+    .menu button {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: var(--ink);
+      text-decoration: none;
+      font: inherit;
+      padding: 9px 12px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.18s ease, background-color 0.18s ease;
+    }
+    .menu a:hover,
+    .menu button:hover {
+      transform: translateY(-1px);
+      background: rgba(17, 90, 67, 0.08);
+    }
+    .menu a.active {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      color: #fff;
+    }
+    .menu-meta {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      background: #e7f3ee;
+      color: var(--accent);
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      backdrop-filter: blur(8px);
+    }
+    h1, h2, h3 {
+      margin-top: 0;
+      font-family: "Space Grotesk", "Plus Jakarta Sans", sans-serif;
+      letter-spacing: 0.01em;
+    }
+    p {
+      color: var(--muted);
+    }
+    .cta,
+    button.primary {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      padding: 11px 18px;
+      color: #fff;
+      font-weight: 600;
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 8px 22px rgba(17, 90, 67, 0.2);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .cta:hover,
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(17, 90, 67, 0.24);
+    }
+    button.ghost,
+    .ghost-link {
+      appearance: none;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: #fff;
+      color: var(--ink);
+      text-decoration: none;
+      cursor: pointer;
+      font: inherit;
+      transition: transform 0.18s ease, border-color 0.18s ease;
+    }
+    button.ghost:hover,
+    .ghost-link:hover {
+      transform: translateY(-1px);
+      border-color: #89b7a5;
+    }
+    .update-link {
+      border-color: #a7c4f5;
+      background: #e8f0ff;
+      color: #17458f;
+      font-weight: 600;
+    }
+    .danger {
+      background: #fff3ef;
+      color: var(--danger);
+      border-color: #f1c5ba;
+    }
+    .notice {
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.75);
+      margin-bottom: 16px;
+    }
+    .notice.error {
+      border-color: #efb8ab;
+      background: #fff2ef;
+      color: var(--danger);
+    }
+    .notice.success {
+      border-color: #b8d9cb;
+      background: #edf8f2;
+      color: var(--accent);
+    }
+    label {
+      display: block;
+      font-size: 0.92rem;
+      margin-bottom: 5px;
+    }
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 11px;
+      font: inherit;
+      background: #fff;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #68a891;
+      box-shadow: 0 0 0 3px rgba(36, 156, 131, 0.17);
+      outline: none;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .page-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .card-grid {
+      display: grid;
+      gap: 16px;
+    }
+    .summary-section {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .summary-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: #fff;
+    }
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+    }
+    .summary-table thead tr {
+      background: linear-gradient(180deg, #eff9f4, #e7f4ee);
+    }
+    .summary-table th,
+    .summary-table td {
+      text-align: left;
+      padding: 11px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.92rem;
+    }
+    .summary-table tbody tr:nth-child(even) {
+      background: #fbfdfc;
+    }
+    .summary-link {
+      color: var(--accent);
+      font-weight: 700;
+      text-decoration: none;
+    }
+    .summary-link:hover {
+      text-decoration: underline;
+    }
+    .use-case-card {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.72);
+      display: grid;
+      gap: 14px;
+      scroll-margin-top: 120px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .use-case-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 26px rgba(17, 33, 23, 0.12);
+    }
+    .use-case-card-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .use-case-meta {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 18px;
+    }
+    .subcard {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px;
+      background: #fff;
+    }
+    .history-item {
+      border-left: 3px solid var(--border);
+      padding-left: 12px;
+    }
+    @media (max-width: 760px) {
+      .shell {
+        width: min(100%, calc(100% - 20px));
+        margin: 12px auto;
+      }
+      .menu {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .menu-links,
+      .menu-meta {
+        justify-content: flex-start;
+      }
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="dashboard-title-bar">AI Governance Dashboard</header>
+
+    <nav class="menu">
+      <div class="menu-links">
+        <a href="/register" class="{% if active_page == 'register' %}active{% endif %}">AI Usage Registration</a>
+        <a href="/registered-use-cases" class="{% if active_page == 'use_cases' %}active{% endif %}">Registered Use Cases</a>
+        <a href="/ai-policy" class="{% if active_page == 'ai_policy' %}active{% endif %}">AI Policy</a>
+      </div>
+      <div class="menu-meta">
+        <span class="badge">Audit history enabled</span>
+      </div>
+    </nav>
+
+    <main class="panel">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</body>
+</html>

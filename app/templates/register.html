@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% set title = "AI Usage Registration" %}
+{% set active_page = "register" %}
+{% block content %}
+<h1>AI Usage Registration</h1>
+<p>Register AI usage using the governance schema layout.</p>
+
+<form action="/submit" method="post" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+  <div style="grid-column:1 / -1;font-weight:700;margin-top:4px;">Basic Information</div>
+  <div>
+    <label for="use_case_title">Use Case Title</label>
+    <input id="use_case_title" name="use_case_title" required minlength="5" />
+  </div>
+  <div>
+    <label for="ai_system_name">AI System Name</label>
+    <input id="ai_system_name" name="ai_system_name" required />
+  </div>
+  <div>
+    <label for="business_unit">Business Unit</label>
+    <input id="business_unit" name="business_unit" required />
+  </div>
+  <div>
+    <label for="owner_name">Owner Name</label>
+    <input id="owner_name" name="owner_name" required />
+  </div>
+  <div style="grid-column:1 / -1;">
+    <label for="owner_email">Owner Email</label>
+    <input id="owner_email" name="owner_email" type="email" required />
+  </div>
+  <div style="grid-column:1 / -1;">
+    <label for="business_purpose">Business Purpose</label>
+    <textarea id="business_purpose" name="business_purpose" required minlength="10"></textarea>
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">AI Function / Use Type</div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    {% for option in ai_function_types %}
+    <label><input type="checkbox" name="ai_function_type" value="{{ option }}" /> {{ option }}</label>
+    {% endfor %}
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">Data Classification</div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    {% for category in data_category_options %}
+    <label><input type="checkbox" name="data_categories" value="{{ category }}" /> {{ category }}</label>
+    {% endfor %}
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">Model / Vendor Information</div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div>
+      <label for="uses_external_model_provider">Uses external model/provider?</label>
+      <select id="uses_external_model_provider" name="uses_external_model_provider" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="false" selected>No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+    <div>
+      <label for="ai_vendor_name">AI Vendor Name</label>
+      <input id="ai_vendor_name" name="ai_vendor_name" placeholder="OpenAI" />
+    </div>
+    <div>
+      <label for="model_name">Model Name</label>
+      <input id="model_name" name="model_name" placeholder="GPT-4.1" />
+    </div>
+    <div>
+      <label for="deployment_type">Deployment Type</label>
+      <select id="deployment_type" name="deployment_type" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="">Select deployment type</option>
+        {% for option in deployment_type_options %}
+        <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="api_or_ui_usage">API or UI Usage</label>
+      <select id="api_or_ui_usage" name="api_or_ui_usage" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="">Select interface</option>
+        {% for option in api_or_ui_options %}
+        <option value="{{ option }}">{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="data_retention_by_vendor">Data retention by vendor</label>
+      <select id="data_retention_by_vendor" name="data_retention_by_vendor" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="false" selected>No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+    <div>
+      <label for="contract_approved">Contract approved?</label>
+      <select id="contract_approved" name="contract_approved" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="false" selected>No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">Risk and Impact</div>
+  <div style="grid-column:1 / -1;">
+    <label for="risk_level">Risk Level</label>
+    <select id="risk_level" name="risk_level" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+      <option value="unknown">Don't know</option>
+      <option value="low">Low</option>
+      <option value="medium">Medium</option>
+      <option value="high">High</option>
+      <option value="Prohibited / Not allowed">Prohibited / Not allowed</option>
+    </select>
+  </div>
+  <div>
+    <label for="business_criticality">Business Criticality</label>
+    <select id="business_criticality" name="business_criticality" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+      {% for option in business_criticality_levels %}
+      <option value="{{ option }}" {% if option == "Low" %}selected{% endif %}>{{ option }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="human_review_required">Human Review Required</label>
+    <select id="human_review_required" name="human_review_required" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+      {% for option in human_review_options %}
+      <option value="{{ option }}" {% if option == "Not applicable" %}selected{% endif %}>{{ option }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    <label><input type="checkbox" name="human_impacting_output" value="true" /> Human-impacting output</label>
+    <label><input type="checkbox" name="automated_decision_making" value="true" /> Automated decision making</label>
+    <label><input type="checkbox" name="human_override_available" value="true" /> Human override available</label>
+    <label><input type="checkbox" name="federal_client_context" value="true" /> Federal client context</label>
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">System Integration</div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    <label style="grid-column:1 / -1;font-weight:600;margin-bottom:4px;">Connected Systems</label>
+    {% for option in common_connected_systems %}
+    <label><input type="checkbox" name="connected_systems" value="{{ option }}" /> {{ option }}</label>
+    {% endfor %}
+  </div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    <label><input type="checkbox" name="production_access" value="true" /> Production access</label>
+    <label><input type="checkbox" name="client_facing" value="true" /> Client facing</label>
+    <label><input type="checkbox" name="writes_to_systems" value="true" /> Writes to systems</label>
+    <label><input type="checkbox" name="reads_from_sensitive_systems" value="true" /> Reads from sensitive systems</label>
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">Security and Audit</div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div>
+      <label for="security_review_status">Security Review Status</label>
+      <select id="security_review_status" name="security_review_status" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        {% for option in security_review_status_options %}
+        <option value="{{ option }}" {% if option == "Not started" %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="audit_trail_retention">Audit Trail Retention</label>
+      <select id="audit_trail_retention" name="audit_trail_retention" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        {% for option in audit_retention_options %}
+        <option value="{{ option }}" {% if option == "90 days" %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <label><input type="checkbox" name="security_review_required" value="true" /> Security review required</label>
+    <label><input type="checkbox" name="logging_enabled" value="true" /> Logging enabled</label>
+    <label><input type="checkbox" name="access_control_defined" value="true" /> Access control defined</label>
+    <label><input type="checkbox" name="data_encryption_required" value="true" /> Data encryption required</label>
+  </div>
+
+  <div style="grid-column:1 / -1;font-weight:700;">Governance Workflow</div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div>
+      <label for="approval_status">Approval Status</label>
+      <select id="approval_status" name="approval_status" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        {% for option in approval_status_options %}
+        <option value="{{ option }}" {% if option == "Draft" %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="review_owner">Review Owner</label>
+      <input id="review_owner" name="review_owner" />
+    </div>
+    <div>
+      <label for="approval_date">Approval Date</label>
+      <input id="approval_date" name="approval_date" type="date" />
+    </div>
+    <div>
+      <label for="next_review_date">Next Review Date</label>
+      <input id="next_review_date" name="next_review_date" type="date" />
+    </div>
+    <div>
+      <label for="expiration_date">Expiration Date</label>
+      <input id="expiration_date" name="expiration_date" type="date" />
+    </div>
+    <div>
+      <label for="active">Active</label>
+      <select id="active" name="active" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="false" selected>No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+    <label style="grid-column:1 / -1;"><input type="checkbox" name="policy_exception_needed" value="true" /> Policy exception needed</label>
+    <div style="grid-column:1 / -1;">
+      <label for="notes">Notes</label>
+      <textarea id="notes" name="notes"></textarea>
+    </div>
+  </div>
+
+  {# ── Anti-abuse controls ──────────────────────────────────────────────── #}
+
+  {# Honeypot: hidden from real users; bots typically fill every field #}
+  <div style="display:none;" aria-hidden="true">
+    <label for="website">Website (leave blank)</label>
+    <input id="website" name="website" tabindex="-1" autocomplete="off" />
+  </div>
+
+  {# Math CAPTCHA #}
+  <div style="grid-column:1 / -1;border:1px solid var(--border);border-radius:12px;padding:14px;background:#f9fdf9;">
+    <div style="font-weight:700;margin-bottom:8px;">Human Verification</div>
+    {% if captcha_error %}
+    <div style="color:#8f2d1f;margin-bottom:8px;font-size:0.92rem;">{{ captcha_error }}</div>
+    {% endif %}
+    <label for="captcha_answer">{{ captcha.question }}</label>
+    <input id="captcha_answer" name="captcha_answer" inputmode="numeric" pattern="[0-9]*" autocomplete="off" required style="max-width:120px;" />
+    <input type="hidden" name="captcha_token" value="{{ captcha.token }}" />
+    <p style="margin:6px 0 0;font-size:0.85rem;color:var(--muted);">Your submission will enter a Pending Review queue before it is visible to the team.</p>
+  </div>
+
+  <div class="actions" style="grid-column:1 / -1;justify-content:flex-end;">
+    <button type="submit" class="primary">Submit Use Case</button>
+  </div>
+</form>
+{% endblock %}

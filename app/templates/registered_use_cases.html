@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% set title = "Registered Use Cases" %}
+{% set active_page = "use_cases" %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Registered Use Cases</h1>
+    <p>Each card includes the full change history, with every recorded action and timestamp.</p>
+  </div>
+  <div class="actions">
+    <span class="badge">{{ items|length }} total records</span>
+    <form method="get" action="/registered-use-cases" class="actions">
+      <label for="sort_by" style="margin:0;">Sort by</label>
+      <select id="sort_by" name="sort_by" style="max-width:240px;">
+        {% for value, label in sort_options.items() %}
+        <option value="{{ value }}" {% if selected_sort == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit" class="ghost">Apply</button>
+    </form>
+  </div>
+</div>
+
+{% if not items %}
+<div class="notice">No use cases have been registered yet.</div>
+{% endif %}
+
+{% if summary_items %}
+<section class="summary-section">
+  <h2 style="margin-bottom:0;">Use Cases Summary</h2>
+  <p style="margin:0;">Key fields for all use cases, sorted by last updated time. Click any title to jump to the full details below.</p>
+  <div class="summary-wrap">
+    <table class="summary-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Title</th>
+          <th>System</th>
+          <th>Owner</th>
+          <th>Business Unit</th>
+          <th>Risk</th>
+          <th>Status</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for use_case in summary_items %}
+        <tr>
+          <td>{{ loop.index }}</td>
+          <td>
+            <a href="#use-case-{{ use_case.id }}" class="summary-link">{{ use_case.title }}</a>
+          </td>
+          <td>{{ use_case.system_name }}</td>
+          <td>{{ use_case.owner_name }}</td>
+          <td>{{ use_case.business_unit }}</td>
+          <td>{{ use_case.risk_level.value }} ({{ use_case.risk_score }})</td>
+          <td>
+            {% if use_case.status.value == "Pending Review" %}
+            <span style="color:#b45309;font-weight:700;">⏳ Pending Review</span>
+            {% else %}
+            {{ use_case.status.value }}
+            {% endif %}
+          </td>
+          <td>{{ use_case.updated_at.strftime("%Y-%m-%d %H:%M:%S %Z") }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+<div class="card-grid">
+  {% for item in items %}
+  {% set use_case = item.use_case %}
+  <article id="use-case-{{ use_case.id }}" class="use-case-card">
+    <div class="use-case-card-top">
+      <div>
+        <div style="font-weight:700;color:var(--muted);margin-bottom:6px;">#{{ loop.index }}</div>
+        <h2 style="margin-bottom:8px;">{{ use_case.title }}</h2>
+        <div class="use-case-meta">
+          <span>{{ use_case.system_name }}</span>
+          <span>{{ use_case.business_unit }}</span>
+          <span>{{ use_case.owner_email }}</span>
+        </div>
+      </div>
+      <div class="actions" style="align-items:flex-start;">
+        {% if use_case.status.value == "Pending Review" %}
+        <span class="badge" style="background:#fff3e0;color:#b45309;">Pending Review</span>
+        {% else %}
+        <span class="badge">{{ use_case.risk_level.value }} risk</span>
+        <span class="badge">{{ use_case.status.value }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div><strong>Owner</strong><br />{{ use_case.owner_name }}</div>
+      <div><strong>Risk Score</strong><br />{{ use_case.risk_score }}</div>
+      <div><strong>AI Vendor</strong><br />{{ use_case.ai_vendor or "-" }}</div>
+      <div><strong>Model Name</strong><br />{{ use_case.model_name or "-" }}</div>
+      <div><strong>Deployment Type</strong><br />{{ use_case.deployment_type or "-" }}</div>
+      <div><strong>API or UI</strong><br />{{ use_case.api_or_ui or "-" }}</div>
+      <div><strong>Data retained by vendor?</strong><br />{{ "Yes" if use_case.data_retained_by_vendor else "No" }}</div>
+      <div><strong>Contract approved?</strong><br />{{ "Yes" if use_case.contract_approved else "No" }}</div>
+      <div><strong>Active</strong><br />{{ "Yes" if use_case.active else "No" }}</div>
+      <div><strong>Self-Reported Risk</strong><br />{{ use_case.self_reported_risk_level.value }}</div>
+      <div><strong>Purpose</strong><br />{{ use_case.purpose }}</div>
+      <div><strong>Data Categories</strong><br />{{ use_case.data_categories }}</div>
+      <div><strong>Created</strong><br />{{ use_case.created_at.strftime("%Y-%m-%d %H:%M:%S %Z") }}</div>
+      <div><strong>Updated</strong><br />{{ use_case.updated_at.strftime("%Y-%m-%d %H:%M:%S %Z") }}</div>
+    </div>
+
+    <div class="actions">
+      <a href="/use-cases/{{ use_case.id }}/edit" class="ghost-link update-link">Update</a>
+      {% if use_case.status.value == "Pending Review" %}
+      <form method="post" action="/use-cases/{{ use_case.id }}/approve-pending" class="actions" style="margin:0;">
+        <input type="hidden" name="sort_by" value="{{ selected_sort }}" />
+        <input type="text" name="reviewer" value="Governance Reviewer" required style="max-width:220px;" />
+        <input type="password" name="governance_token" placeholder="Governance token" required style="max-width:220px;" />
+        <button type="submit">Approve Pending</button>
+      </form>
+      {% endif %}
+    </div>
+
+    <section>
+      <h3 style="margin-bottom:10px;">Full Registration Fields</h3>
+      <div class="card-grid" style="gap:12px;">
+        {% for section_name, section_fields in item.registration_view.items() %}
+        <div class="subcard">
+          <div style="font-weight:700;margin-bottom:8px;">{{ section_name }}</div>
+          <div class="info-grid" style="gap:8px 14px;">
+            {% for field_name, field_value in section_fields %}
+            <div>
+              <strong>{{ field_name }}</strong><br />{{ field_value if field_value else "-" }}
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+    <section>
+      <h3 style="margin-bottom:10px;">History</h3>
+      {% if item.events %}
+      <div class="card-grid" style="gap:10px;">
+        {% for event in item.events %}
+        <div class="history-item">
+          <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <strong>{{ event.action.replace("_", " ").title() }}</strong>
+            <span style="color:var(--muted);">{{ event.created_at.strftime("%Y-%m-%d %H:%M:%S %Z") }}</span>
+          </div>
+          <div style="font-size:0.92rem;color:var(--muted);">Actor: {{ event.actor }}</div>
+          <div>{{ event.details }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="notice">No history recorded.</div>
+      {% endif %}
+    </section>
+  </article>
+  {% endfor %}
+</div>
+{% endblock %}

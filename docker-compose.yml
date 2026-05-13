@@ -1,0 +1,13 @@
+services:
+  web:
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: sqlite:///./data/governance.db
+      # Read from local env only; never hardcode secrets in tracked files.
+      CAPTCHA_SECRET: ${CAPTCHA_SECRET:?Set CAPTCHA_SECRET in your local .env or shell env}
+      GOVERNANCE_TOKEN: ${GOVERNANCE_TOKEN:?Set GOVERNANCE_TOKEN in your local .env or shell env}
+    volumes:
+      - ./data:/app/data

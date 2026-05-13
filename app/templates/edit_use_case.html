@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% set title = "Edit Use Case" %}
+{% set active_page = "use_cases" %}
+{% block content %}
+<h1>Edit Use Case</h1>
+<p>Update the record. Any edit is recorded in history and resets the use case back to Submitted.</p>
+
+<form action="/use-cases/{{ use_case.id }}/edit" method="post" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;">
+  <div>
+    <label for="title">Use Case Title</label>
+    <input id="title" name="title" value="{{ use_case.title }}" required minlength="5" />
+  </div>
+  <div>
+    <label for="system_name">AI System Name</label>
+    <input id="system_name" name="system_name" value="{{ use_case.system_name }}" required />
+  </div>
+  <div>
+    <label for="business_unit">Business Unit</label>
+    <input id="business_unit" name="business_unit" value="{{ use_case.business_unit }}" required />
+  </div>
+  <div>
+    <label for="owner_name">Owner Name</label>
+    <input id="owner_name" name="owner_name" value="{{ use_case.owner_name }}" required />
+  </div>
+  <div style="grid-column:1 / -1;">
+    <label for="owner_email">Owner Email</label>
+    <input id="owner_email" name="owner_email" type="email" value="{{ use_case.owner_email }}" required />
+  </div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+    <div style="grid-column:1 / -1;font-weight:600;">Model Vendor</div>
+    <div>
+      <label for="ai_vendor">AI Vendor</label>
+      <input id="ai_vendor" name="ai_vendor" value="{{ use_case.ai_vendor }}" placeholder="OpenAI" />
+    </div>
+    <div>
+      <label for="model_name">Model Name</label>
+      <input id="model_name" name="model_name" value="{{ use_case.model_name }}" placeholder="GPT-4.1" />
+    </div>
+    <div>
+      <label for="deployment_type">Deployment Type</label>
+      <select id="deployment_type" name="deployment_type" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="">Select deployment type</option>
+        {% for option in deployment_type_options %}
+        <option value="{{ option }}" {% if use_case.deployment_type == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="api_or_ui">API or UI</label>
+      <select id="api_or_ui" name="api_or_ui" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="">Select interface</option>
+        {% for option in api_or_ui_options %}
+        <option value="{{ option }}" {% if use_case.api_or_ui == option %}selected{% endif %}>{{ option }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="data_retained_by_vendor">Data retained by vendor?</label>
+      <select id="data_retained_by_vendor" name="data_retained_by_vendor" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="false" {% if not use_case.data_retained_by_vendor %}selected{% endif %}>No</option>
+        <option value="true" {% if use_case.data_retained_by_vendor %}selected{% endif %}>Yes</option>
+      </select>
+    </div>
+    <div>
+      <label for="contract_approved">Contract approved?</label>
+      <select id="contract_approved" name="contract_approved" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+        <option value="false" {% if not use_case.contract_approved %}selected{% endif %}>No</option>
+        <option value="true" {% if use_case.contract_approved %}selected{% endif %}>Yes</option>
+      </select>
+    </div>
+  </div>
+  <div style="grid-column:1 / -1;">
+    <label for="purpose">Business Purpose</label>
+    <textarea id="purpose" name="purpose" required minlength="10">{{ use_case.purpose }}</textarea>
+  </div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    <label style="grid-column:1 / -1;font-weight:600;margin-bottom:4px;">Data Categories</label>
+    {% for category in data_category_options %}
+    <label><input type="checkbox" name="data_categories" value="{{ category }}" {% if category in selected_data_categories %}checked{% endif %} /> {{ category }}</label>
+    {% endfor %}
+  </div>
+  <div style="grid-column:1 / -1;">
+    <label for="self_reported_risk_level">Risk Level</label>
+    <select id="self_reported_risk_level" name="self_reported_risk_level" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+      <option value="unknown" {% if use_case.self_reported_risk_level.value == "Don't know" %}selected{% endif %}>Don't know</option>
+      <option value="low" {% if use_case.self_reported_risk_level.value == "Low" %}selected{% endif %}>Low</option>
+      <option value="medium" {% if use_case.self_reported_risk_level.value == "Medium" %}selected{% endif %}>Medium</option>
+      <option value="high" {% if use_case.self_reported_risk_level.value == "High" %}selected{% endif %}>High</option>
+    </select>
+  </div>
+  <div style="grid-column:1 / -1;">
+    <label for="active">Active</label>
+    <select id="active" name="active" style="width:100%;border:1px solid var(--border);border-radius:10px;padding:10px;font:inherit;background:#fff;">
+      <option value="false" {% if not use_case.active %}selected{% endif %}>No</option>
+      <option value="true" {% if use_case.active %}selected{% endif %}>Yes</option>
+    </select>
+  </div>
+  <div style="grid-column:1 / -1;border:1px dashed var(--border);border-radius:12px;padding:12px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;">
+    <label><input type="checkbox" name="uses_external_model" value="true" {% if use_case.uses_external_model %}checked{% endif %} /> Uses external model/provider</label>
+    <label><input type="checkbox" name="has_human_impact" value="true" {% if use_case.has_human_impact %}checked{% endif %} /> Human-impacting output</label>
+    <label><input type="checkbox" name="automated_decision" value="true" {% if use_case.automated_decision %}checked{% endif %} /> Automated decision-making</label>
+    <label><input type="checkbox" name="federal_client" value="true" {% if use_case.federal_client %}checked{% endif %} /> Federal client context</label>
+  </div>
+  <div class="actions" style="grid-column:1 / -1;justify-content:flex-end;">
+    <a href="/registered-use-cases" class="ghost-link">Cancel</a>
+    <button type="submit" class="primary">Save Changes</button>
+  </div>
+</form>
+{% endblock %}
