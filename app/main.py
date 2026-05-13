@@ -71,7 +71,7 @@ def _require_governance_form_token(token: str) -> None:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    _seed_dummy_use_case()
+    _seed_sample_use_cases()
     yield
 
 
@@ -144,8 +144,74 @@ APPROVAL_STATUS_OPTIONS = [
     "Retired",
 ]
 
-DUMMY_USE_CASE_TITLE = "Demo AI Policy Assistant"
-DUMMY_USE_CASE_OWNER_EMAIL = "demo.owner@example.com"
+SAMPLE_USE_CASE_DEFINITIONS = [
+    {
+        "title": "Knowledge Base Summarizer",
+        "business_unit": "Operations",
+        "owner_name": "Avery Chen",
+        "owner_email": "avery.chen@example.com",
+        "system_name": "KB Copilot",
+        "ai_vendor": "OpenAI",
+        "model_name": "gpt-4.1-mini",
+        "deployment_type": "SaaS",
+        "api_or_ui": "UI",
+        "data_retained_by_vendor": False,
+        "contract_approved": True,
+        "purpose": "Summarizes internal knowledge articles to speed up support response drafting.",
+        "data_categories": "Internal",
+        "uses_external_model": True,
+        "has_human_impact": False,
+        "automated_decision": False,
+        "federal_client": False,
+        "active": True,
+        "self_reported_risk_level": SelfReportedRiskLevel.low,
+        "initial_status": UseCaseStatus.active,
+    },
+    {
+        "title": "Benefits Eligibility Recommender",
+        "business_unit": "People Operations",
+        "owner_name": "Morgan Patel",
+        "owner_email": "morgan.patel@example.com",
+        "system_name": "Eligibility Advisor",
+        "ai_vendor": "Anthropic",
+        "model_name": "claude-3.5-sonnet",
+        "deployment_type": "SaaS",
+        "api_or_ui": "API",
+        "data_retained_by_vendor": True,
+        "contract_approved": False,
+        "purpose": "Recommends likely benefits eligibility outcomes before human HR review.",
+        "data_categories": "PII, Financial",
+        "uses_external_model": True,
+        "has_human_impact": True,
+        "automated_decision": True,
+        "federal_client": False,
+        "active": False,
+        "self_reported_risk_level": SelfReportedRiskLevel.high,
+        "initial_status": UseCaseStatus.submitted,
+    },
+    {
+        "title": "Contract Risk Classifier Pilot",
+        "business_unit": "Legal",
+        "owner_name": "Jordan Rivera",
+        "owner_email": "jordan.rivera@example.com",
+        "system_name": "Clause Insight Pilot",
+        "ai_vendor": "OpenAI",
+        "model_name": "gpt-4.1",
+        "deployment_type": "Azure Gov",
+        "api_or_ui": "UI",
+        "data_retained_by_vendor": False,
+        "contract_approved": True,
+        "purpose": "Flags risky clauses in draft contracts for attorney review.",
+        "data_categories": "Client Confidential, Internal",
+        "uses_external_model": True,
+        "has_human_impact": True,
+        "automated_decision": False,
+        "federal_client": True,
+        "active": False,
+        "self_reported_risk_level": SelfReportedRiskLevel.medium,
+        "initial_status": UseCaseStatus.pending_review,
+    },
+]
 
 Base.metadata.create_all(bind=engine)
 ensure_schema_compatibility()
@@ -537,65 +603,62 @@ def _get_use_case_history_items(db: Session, sort_by: str) -> list[dict[str, obj
     ]
 
 
-def _seed_dummy_use_case() -> None:
+def _seed_sample_use_cases() -> None:
     with SessionLocal() as db:
-        existing_use_case = db.scalar(
-            select(UseCase.id).where(
-                UseCase.title == DUMMY_USE_CASE_TITLE,
-                UseCase.owner_email == DUMMY_USE_CASE_OWNER_EMAIL,
-            )
-        )
+        existing_use_case = db.scalar(select(UseCase.id).limit(1))
         if existing_use_case:
             return
 
-        payload = UseCaseCreate(
-            title=DUMMY_USE_CASE_TITLE,
-            business_unit="Governance",
-            owner_name="Demo Owner",
-            owner_email=DUMMY_USE_CASE_OWNER_EMAIL,
-            system_name="Policy Copilot",
-            ai_vendor="OpenAI",
-            model_name="gpt-4.1",
-            deployment_type="SaaS",
-            api_or_ui="UI",
-            data_retained_by_vendor=False,
-            contract_approved=True,
-            purpose="Demonstrates a seeded AI governance use case for first-run environments.",
-            data_categories="Internal",
-            uses_external_model=True,
-            has_human_impact=False,
-            automated_decision=False,
-            federal_client=False,
-            active=False,
-            self_reported_risk_level=SelfReportedRiskLevel.low,
-        )
+        for item in SAMPLE_USE_CASE_DEFINITIONS:
+            payload = UseCaseCreate(
+                title=item["title"],
+                business_unit=item["business_unit"],
+                owner_name=item["owner_name"],
+                owner_email=item["owner_email"],
+                system_name=item["system_name"],
+                ai_vendor=item["ai_vendor"],
+                model_name=item["model_name"],
+                deployment_type=item["deployment_type"],
+                api_or_ui=item["api_or_ui"],
+                data_retained_by_vendor=item["data_retained_by_vendor"],
+                contract_approved=item["contract_approved"],
+                purpose=item["purpose"],
+                data_categories=item["data_categories"],
+                uses_external_model=item["uses_external_model"],
+                has_human_impact=item["has_human_impact"],
+                automated_decision=item["automated_decision"],
+                federal_client=item["federal_client"],
+                active=item["active"],
+                self_reported_risk_level=item["self_reported_risk_level"],
+            )
 
-        use_case = UseCase(status=UseCaseStatus.submitted)
-        _apply_use_case_payload(use_case, payload)
-        use_case.registration_payload = json.dumps(
-            {
-                "use_case_title": payload.title,
-                "ai_system_name": payload.system_name,
-                "business_unit": payload.business_unit,
-                "owner_name": payload.owner_name,
-                "owner_email": payload.owner_email,
-                "business_purpose": payload.purpose,
-                "data_categories": ["Internal"],
-                "risk_level": payload.self_reported_risk_level.value,
-                "approval_status": use_case.status.value,
-                "notes": "Automatically seeded demo record.",
-            }
-        )
+            use_case = UseCase(status=item["initial_status"])
+            _apply_use_case_payload(use_case, payload)
+            use_case.registration_payload = json.dumps(
+                {
+                    "use_case_title": payload.title,
+                    "ai_system_name": payload.system_name,
+                    "business_unit": payload.business_unit,
+                    "owner_name": payload.owner_name,
+                    "owner_email": payload.owner_email,
+                    "business_purpose": payload.purpose,
+                    "data_categories": [category.strip() for category in payload.data_categories.split(",")],
+                    "risk_level": payload.self_reported_risk_level.value,
+                    "approval_status": use_case.status.value,
+                    "notes": "Automatically seeded sample record.",
+                }
+            )
 
-        db.add(use_case)
-        db.flush()
-        _emit_audit_event(
-            db,
-            use_case.id,
-            action="use_case_seeded",
-            actor="system",
-            details="Seeded default demo use case",
-        )
+            db.add(use_case)
+            db.flush()
+            _emit_audit_event(
+                db,
+                use_case.id,
+                action="use_case_seeded",
+                actor="system",
+                details=f"Seeded sample use case: {use_case.title}",
+            )
+
         db.commit()
 @app.get("/")
 def home():

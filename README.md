@@ -21,6 +21,11 @@ A lightweight Enterprise AI Governance Platform built with Python and FastAPI.
    - API docs: `http://127.0.0.1:8000/docs`
    - Intake UI: `http://127.0.0.1:8000/`
 
+## Streamlit Cloud
+
+If you deploy on Streamlit Cloud, set the app entry file to `streamlit_app.py`.
+That file is the Streamlit-native launcher for this repository.
+
 ## Navigation and workflow
 
 1. The top menu separates `AI Usage Registration` and `Registered Use Cases`.

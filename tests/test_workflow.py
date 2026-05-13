@@ -4,6 +4,7 @@ import os
 
 os.environ.setdefault("GOVERNANCE_TOKEN", "test-governance-token")
 os.environ.setdefault("CAPTCHA_SECRET", "test-captcha-secret")
+os.environ.setdefault("DATABASE_URL", "sqlite:///./test_governance.db")
 
 from fastapi.testclient import TestClient
 
