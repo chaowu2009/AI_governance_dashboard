@@ -2,7 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
-from .models import RiskLevel, SelfReportedRiskLevel, UseCaseStatus
+from app.models import RiskLevel, SelfReportedRiskLevel, UseCaseStatus
 
 
 class UseCaseCreate(BaseModel):

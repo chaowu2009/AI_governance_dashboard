@@ -1,4 +1,4 @@
-from .models import RiskLevel
+from app.models import RiskLevel
 
 SENSITIVE_CATEGORIES = {
     "pii",

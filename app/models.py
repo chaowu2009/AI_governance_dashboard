@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from sqlalchemy import Boolean, DateTime, Enum as SqlEnum, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from .database import Base
+from app.database import Base
 
 
 US_EASTERN_TZ = ZoneInfo("America/New_York")
