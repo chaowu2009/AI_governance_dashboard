@@ -13,10 +13,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .database import Base, SessionLocal, engine, ensure_schema_compatibility, get_db
-from .models import AuditEvent, RiskLevel, SelfReportedRiskLevel, UseCase, UseCaseStatus, utc_now
-from .risk import classify_risk
-from .schemas import AuditEventOut, StatusUpdateOut, UseCaseApprovalIn, UseCaseCreate, UseCaseOut
+from app.database import Base, SessionLocal, engine, ensure_schema_compatibility, get_db
+from app.models import AuditEvent, RiskLevel, SelfReportedRiskLevel, UseCase, UseCaseStatus, utc_now
+from app.risk import classify_risk
+from app.schemas import AuditEventOut, StatusUpdateOut, UseCaseApprovalIn, UseCaseCreate, UseCaseOut
 
 # ---------------------------------------------------------------------------
 # Security helpers
