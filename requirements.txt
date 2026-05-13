@@ -9,3 +9,4 @@ jinja2
 python-multipart
 tzdata
 streamlit
+python-dotenv
