@@ -1,10 +1,27 @@
 import os
+import tempfile
+
+from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy import text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./governance.db")
+
+
+def _default_database_url() -> str:
+    """Choose a writable SQLite location when running on Streamlit Cloud."""
+    if os.getenv("DATABASE_URL"):
+        return os.environ["DATABASE_URL"]
+
+    if os.getenv("STREAMLIT_SERVER_PORT") or os.getenv("STREAMLIT_RUNTIME") or os.getenv("STREAMLIT_SHARING_MODE"):
+        temp_db_path = Path(tempfile.gettempdir()) / "governance.db"
+        return f"sqlite:///{temp_db_path.as_posix()}"
+
+    return "sqlite:///./governance.db"
+
+
+DATABASE_URL = _default_database_url()
 
 
 class Base(DeclarativeBase):
